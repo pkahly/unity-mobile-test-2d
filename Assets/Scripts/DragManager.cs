@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DragManager : MonoBehaviour {
-    bool isDraggingActive = false;
-    Draggable draggingObject;
+    public bool isDraggingActive = false;
+    public Draggable draggingObject;
 
     void Start() {
         
@@ -12,7 +12,7 @@ public class DragManager : MonoBehaviour {
 
     void Update() {
         // Release dragged object
-        if (isDraggingActive && (Input.GetMouseButtonDown(0) || (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended))) {
+        if (isDraggingActive && (!Input.GetMouseButton(0) || (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended))) {
             Drop();
             return;
         }
@@ -46,7 +46,7 @@ public class DragManager : MonoBehaviour {
     }
 
     void InitDrag() {
-        isDraggingActive = true;
+        UpdateDragStatus(true);
     }
 
     void Drag(Vector2 worldPos) {
@@ -54,6 +54,11 @@ public class DragManager : MonoBehaviour {
     }
 
     void Drop() {
-        isDraggingActive = false;
+        UpdateDragStatus(false);
+    }
+
+    void UpdateDragStatus(bool isDragging) {
+        isDraggingActive = isDragging;
+        draggingObject.gameObject.layer = isDragging ? Layers.Draggable : Layers.Default;
     }
 }
