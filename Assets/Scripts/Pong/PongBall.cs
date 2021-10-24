@@ -10,16 +10,16 @@ public class PongBall : MonoBehaviour
     {
         rigidBody = gameObject.GetComponent<Rigidbody2D>();
 
-        rigidBody.velocity = new Vector2(2.0f, 10.0f);
+        rigidBody.velocity = new Vector2(10.0f, 1.0f);
     }
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        // TODO play sounds
+        // TODO play sounds depending on what it hit
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log(other);
+        // Win/Lose
     }
 }

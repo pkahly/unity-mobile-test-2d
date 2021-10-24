@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class PlayerPaddle : MonoBehaviour
 {
-    public float min;
-    public float max;
+    public float minX;
+    public float maxX;
+    public float minY;
+    public float maxY;
 
     void Start()
     {
@@ -16,9 +18,10 @@ public class PlayerPaddle : MonoBehaviour
 
     void Update()
     {
-        float mouseY = Camera.main.ScreenToWorldPoint(Input.mousePosition).y;
-        Debug.Log(mouseY);
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float mouseX = mousePos.x;
+        float mouseY = mousePos.y;
 
-        transform.position = new Vector2(transform.position.x, Mathf.Clamp(mouseY, min, max));
+        transform.position = new Vector2(Mathf.Clamp(mouseX, minX, maxX), Mathf.Clamp(mouseY, minY, maxY));
     }
 }
