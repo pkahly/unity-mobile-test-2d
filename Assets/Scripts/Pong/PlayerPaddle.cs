@@ -18,9 +18,20 @@ public class PlayerPaddle : MonoBehaviour
 
     void Update()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float mouseY = mousePos.y;
+        // Get Screen Position
+        Vector2 screenPos;
+        if (Input.touchCount == 1)
+        {
+            screenPos = Input.GetTouch(0).position;
+        }
+        else
+        {
+            screenPos = Input.mousePosition;
+        }
 
-        transform.position = new Vector2(transform.position.x, Mathf.Clamp(mouseY, minY, maxY));
+        // Convert to world coordinates
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+
+        transform.position = new Vector2(transform.position.x, Mathf.Clamp(worldPos.y, minY, maxY));
     }
 }
