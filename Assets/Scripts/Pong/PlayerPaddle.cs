@@ -19,9 +19,8 @@ public class PlayerPaddle : MonoBehaviour
     void Update()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float mouseX = mousePos.x;
         float mouseY = mousePos.y;
 
-        transform.position = new Vector2(Mathf.Clamp(mouseX, minX, maxX), Mathf.Clamp(mouseY, minY, maxY));
+        transform.position = new Vector2(transform.position.x, Mathf.Clamp(mouseY, minY, maxY));
     }
 }
