@@ -1,16 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System;
 
 public class ImagePanelController : MonoBehaviour
 {
     private ImagePanel[] imagePanels;
     private int gridSize;
+    private ImagePanel selected;
 
     void Start()
     {
         // Get the Image Panels which will display the image
         imagePanels = GetComponentsInChildren<ImagePanel>();
+
+        // Add OnClick Listener
+        foreach (ImagePanel panel in imagePanels)
+        {
+            panel.button.onClick.AddListener(() => { OnButtonClick(panel); });
+        }
 
         // Get the side-length of the grid
         gridSize = (int)Math.Sqrt(imagePanels.Length);
@@ -62,12 +70,33 @@ public class ImagePanelController : MonoBehaviour
         {
             dividedTextures[i].Apply();
 
-            imagePanels[i].SetImage(dividedTextures[i]);
+            imagePanels[i].image.texture = dividedTextures[i];
         }
     }
 
-    void Update()
+    public void OnButtonClick(ImagePanel panel)
     {
+        if (selected == null)
+        {
+            // Select this panel
+            selected = panel;
+        }
+        else if (selected == panel)
+        {
+            // If it is clicked twice, deselect it
+            EventSystem.current.SetSelectedGameObject(null);
+            selected = null;
+        }
+        else
+        {
+            // Swap the two images
+            Texture texture = selected.image.texture;
+            selected.image.texture = panel.image.texture;
+            panel.image.texture = texture;
 
+            // Deselect
+            EventSystem.current.SetSelectedGameObject(null);
+            selected = null;
+        }
     }
 }
