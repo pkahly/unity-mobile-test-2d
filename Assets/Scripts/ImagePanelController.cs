@@ -5,6 +5,8 @@ using System;
 
 public class ImagePanelController : MonoBehaviour
 {
+    public string imagePath = "Images/sample1";
+
     private ImagePanel[] imagePanels;
     private int gridSize;
     private ImagePanel selected;
@@ -24,7 +26,7 @@ public class ImagePanelController : MonoBehaviour
         gridSize = (int)Math.Sqrt(imagePanels.Length);
 
         // Load the image
-        Texture2D texture = Resources.Load<Texture2D>("Images/sample");
+        Texture2D texture = Resources.Load<Texture2D>(imagePath);
         if (texture == null)
         {
             throw new ArgumentException("Failed to load image");
