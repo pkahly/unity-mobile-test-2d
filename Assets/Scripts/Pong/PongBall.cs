@@ -9,6 +9,11 @@ public class PongBall : MonoBehaviour
     public Text playerScoreText;
     public Text enemyScoreText;
 
+    public AudioSource paddleHit;
+    public AudioSource wallHit;
+    public AudioSource win;
+    public AudioSource lose;
+
     private Rigidbody2D rigidBody;
     private int playerScore = 0;
     private int enemyScore = 0;
@@ -55,6 +60,19 @@ public class PongBall : MonoBehaviour
         float xSpeed = Mathf.Clamp(rigidBody.velocity.x, -maxSpeed, maxSpeed);
         float ySpeed = Mathf.Clamp(rigidBody.velocity.y, -maxSpeed, maxSpeed);
         rigidBody.velocity = new Vector2(xSpeed, ySpeed);
+
+        // Set minimum x velocity while the game is in progress
+        if (!isGameOver && Mathf.Abs(rigidBody.velocity.x) < 5f)
+        {
+            if (rigidBody.velocity.x >= 0)
+            {
+                rigidBody.velocity = new Vector2(5f, rigidBody.velocity.y);
+            }
+            else
+            {
+                rigidBody.velocity = new Vector2(-5f, rigidBody.velocity.y);
+            }
+        }
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -67,6 +85,13 @@ public class PongBall : MonoBehaviour
             float xSpeed = rigidBody.velocity.x * 1.05f;
             float ySpeed = rigidBody.velocity.y + Random.Range(-1.0f, 1.0f);
             rigidBody.velocity = new Vector2(xSpeed, ySpeed);
+
+            // Play paddle sound
+            paddleHit.Play();
+        }
+        else
+        {
+            wallHit.Play();
         }
     }
 
@@ -81,6 +106,9 @@ public class PongBall : MonoBehaviour
         // Win/Lose
         if (other.gameObject.GetComponent<PlayerEndZone>())
         {
+            // Play lose sound
+            lose.Play();
+
             isGameOver = true;
             enemyScore++;
             enemyScoreText.text = "" + enemyScore;
@@ -88,6 +116,9 @@ public class PongBall : MonoBehaviour
         }
         else if (other.gameObject.GetComponent<EnemyEndZone>())
         {
+            // Play win sound
+            win.Play();
+
             isGameOver = true;
             playerScore++;
             playerScoreText.text = "" + playerScore;
