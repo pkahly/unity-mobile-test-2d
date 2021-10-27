@@ -12,14 +12,20 @@ class WorldGenerator
     private int xLength;
     private int zLength;
 
+    private WorldSpace[,] world;
+    private MazeSpec mazeSpec;
+    private MazeCell[,] maze;
+
     public WorldSpace[,] GenerateWorld(MazeSpec mazeSpec)
     {
+        this.mazeSpec = mazeSpec;
+
         // Set World Size
         this.xLength = ConvertToWorldCoord(mazeSpec.mazeXLength);
         this.zLength = ConvertToWorldCoord(mazeSpec.mazeZLength);
 
         // Create Empty World
-        WorldSpace[,] world = new WorldSpace[xLength, zLength];
+        world = new WorldSpace[xLength, zLength];
 
         for (int x = 0; x < xLength; x++)
         {
@@ -48,12 +54,59 @@ class WorldGenerator
         }
 
         // Generate Maze
-        var maze = MazeGenerator.Generate(mazeSpec);
+        maze = MazeGenerator.Generate(mazeSpec);
 
         // Add Maze to the World
         ApplyMazeToWorld(world, mazeSpec, maze);
 
         return world;
+    }
+
+    public WorldSpace[,] RebuildWorld()
+    {
+        ApplyMazeToWorld(world, mazeSpec, maze);
+        return world;
+    }
+
+    public void TryAddPath(Vector2 mazePos)
+    {
+        int mazeX = Mathf.RoundToInt(mazePos.x);
+        int mazeY = Mathf.RoundToInt(mazePos.y);
+
+        if (mazeX >= 0 && mazeX < mazeSpec.mazeXLength && mazeY >= 0 && mazeY < mazeSpec.mazeZLength)
+        {
+            List<MazeCell> path = DFS.FindPath(maze,
+                new Position
+                {
+                    x = 0,
+                    y = 0,
+                },
+                new Position
+                {
+                    x = mazeX,
+                    y = mazeY,
+                }, mazeSpec.mazeXLength, mazeSpec.mazeZLength);
+
+            if (path == null)
+            {
+                return;
+            }
+
+            // If we found a path, reset all the nodes to have 'onPath' false
+            for (int x = 0; x < mazeSpec.mazeXLength; x++)
+            {
+                for (int y = 0; y < mazeSpec.mazeZLength; y++)
+                {
+                    maze[x, y].onPath = false;
+                }
+            }
+
+            // Set 'onPath' to true for the nodes in the path
+            foreach (MazeCell cell in path)
+            {
+                cell.onPath = true;
+            }
+        }
     }
 
     public Vector3 GetRandomPosition(MazeSpec mazeSpec)
@@ -89,45 +142,54 @@ class WorldGenerator
                 int worldZ = worldStartZ + ConvertToWorldCoord(mazeZ);
 
                 // Set cell's coordinates to floor type
-                world[worldX, worldZ].type = WorldSpace.Type.floor;
+                world[worldX, worldZ].type = FloorOrPath(cell);
 
                 // Knock down walls
                 if (!cell.isWallUp(Wall.UP))
                 {
                     int wallX = worldX;
                     int wallZ = worldZ + 1;
-                    world[wallX, wallZ].type = WorldSpace.Type.floor;
+                    world[wallX, wallZ].type = FloorOrPath(cell);
                 }
 
                 if (!cell.isWallUp(Wall.LEFT))
                 {
                     int wallX = worldX - 1;
                     int wallZ = worldZ;
-                    world[wallX, wallZ].type = WorldSpace.Type.floor;
+                    world[wallX, wallZ].type = FloorOrPath(cell);
                 }
 
                 if (!cell.isWallUp(Wall.RIGHT))
                 {
                     int wallX = worldX + 1;
                     int wallZ = worldZ;
-                    world[wallX, wallZ].type = WorldSpace.Type.floor;
+                    world[wallX, wallZ].type = FloorOrPath(cell);
                 }
 
                 if (!cell.isWallUp(Wall.DOWN))
                 {
                     int wallX = worldX;
                     int wallZ = worldZ - 1;
-                    world[wallX, wallZ].type = WorldSpace.Type.floor;
+                    world[wallX, wallZ].type = FloorOrPath(cell);
                 }
 
                 if (!cell.isWallUp(Wall.UP_LEFT_CORNER))
                 {
                     int wallX = worldX - 1;
                     int wallZ = worldZ + 1;
-                    world[wallX, wallZ].type = WorldSpace.Type.floor;
+                    world[wallX, wallZ].type = FloorOrPath(cell);
                 }
             }
         }
+    }
+
+    private WorldSpace.Type FloorOrPath(MazeCell cell)
+    {
+        if (cell.onPath)
+        {
+            return WorldSpace.Type.path;
+        }
+        return WorldSpace.Type.floor;
     }
 
     public int GetXLength()

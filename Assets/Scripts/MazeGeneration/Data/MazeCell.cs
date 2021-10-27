@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public enum Wall {
+public enum Wall
+{
     LEFT = 0,
     RIGHT = 1,
     UP = 2,
@@ -11,12 +12,17 @@ public enum Wall {
     UP_LEFT_CORNER = 4,
 }
 
-public enum CellType {
+public enum CellType
+{
     MAZE = 0,
     COURTYARD = 1,
 }
 
-public class MazeCell {
+public class MazeCell
+{
+    // Used to track the path while traversing the maze
+    public bool onPath = false;
+
     private Dictionary<Wall, bool> walls = new Dictionary<Wall, bool>() {
         { Wall.LEFT, true },
         { Wall.RIGHT, true },
@@ -29,29 +35,36 @@ public class MazeCell {
     private bool visited = false;
     private CellType type = CellType.MAZE;
 
-    public bool isWallUp(Wall wall) {
+    public bool isWallUp(Wall wall)
+    {
         return walls[wall];
     }
 
-    public void removeWall(Wall wall) {
+    public void removeWall(Wall wall)
+    {
         walls[wall] = false;
     }
 
-    public void removeWalls(Wall[] wallsToRemove) {
-        foreach (Wall wall in wallsToRemove) {
+    public void removeWalls(Wall[] wallsToRemove)
+    {
+        foreach (Wall wall in wallsToRemove)
+        {
             walls[wall] = false;
         }
     }
 
-    public bool isVisited() {
+    public bool isVisited()
+    {
         return visited;
     }
 
-    public void markVisited() {
+    public void markVisited()
+    {
         visited = true;
     }
 
-    public static Wall GetOppositeWall(Wall wall) {
+    public static Wall GetOppositeWall(Wall wall)
+    {
         switch (wall)
         {
             case Wall.RIGHT: return Wall.LEFT;
@@ -63,11 +76,13 @@ public class MazeCell {
         throw new ArgumentException("No such wall: " + wall);
     }
 
-    public CellType getType() {
+    public CellType getType()
+    {
         return type;
     }
 
-    public void setType(CellType type) {
+    public void setType(CellType type)
+    {
         this.type = type;
     }
 }

@@ -45,19 +45,17 @@ public class MazeRenderer : MonoBehaviour
         Vector2 mazePos = ConvertToMazePos(screenPos);
 
         // Convert to World coords and mark as a path
-        int worldX = worldGenerator.ConvertToWorldCoord(mazePos.x);
-        int worldY = worldGenerator.ConvertToWorldCoord(mazePos.y);
-        if (worldX >= 0 && worldX < worldGenerator.GetXLength() && worldY >= 0 && worldY < worldGenerator.GetZLength())
-        {
-            world[worldX, worldY].type = WorldSpace.Type.path;
+        worldGenerator.TryAddPath(mazePos);
 
-            // Redraw Maze
-            DrawMaze();
-        }
+        // Redraw Maze
+        DrawMaze();
     }
 
     void DrawMaze()
     {
+        // Refresh the world to pick up maze changes
+        world = worldGenerator.RebuildWorld();
+
         // Create Maze Texture
         Color[] pixels = new Color[worldGenerator.GetXLength() * worldGenerator.GetZLength()];
         for (int x = 0; x < worldGenerator.GetXLength(); x++)
