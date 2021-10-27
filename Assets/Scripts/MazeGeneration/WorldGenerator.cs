@@ -15,6 +15,7 @@ class WorldGenerator
     private WorldSpace[,] world;
     private MazeSpec mazeSpec;
     private MazeCell[,] maze;
+    private List<Position> exitList;
 
     public WorldSpace[,] GenerateWorld(MazeSpec mazeSpec)
     {
@@ -54,7 +55,9 @@ class WorldGenerator
         }
 
         // Generate Maze
-        maze = MazeGenerator.Generate(mazeSpec);
+        MazeGenData data = MazeGenerator.Generate(mazeSpec);
+        maze = data.maze;
+        exitList = data.exitList;
 
         // Add Maze to the World
         ApplyMazeToWorld(world, mazeSpec, maze);
@@ -68,28 +71,60 @@ class WorldGenerator
         return world;
     }
 
-    public void TryAddPath(Vector2 mazePos)
+    public void TryAddPath(Position mazePos)
     {
-        int mazeX = Mathf.RoundToInt(mazePos.x);
-        int mazeY = Mathf.RoundToInt(mazePos.y);
+        if (exitList.Count != 2)
+        {
+            throw new Exception("Wrong number of exits");
+        }
+        Position exit1 = exitList[0];
+        Position exit2 = exitList[1];
+
+        int mazeX = mazePos.x;
+        int mazeY = mazePos.y;
 
         if (mazeX >= 0 && mazeX < mazeSpec.mazeXLength && mazeY >= 0 && mazeY < mazeSpec.mazeZLength)
         {
-            List<MazeCell> path = DFS.FindPath(maze,
-                new Position
-                {
-                    x = 0,
-                    y = 0,
-                },
+            // Try starting from first exit
+            List<MazeCell> path1 = DFS.FindPath(maze,
+                exit1,
                 new Position
                 {
                     x = mazeX,
                     y = mazeY,
                 }, mazeSpec.mazeXLength, mazeSpec.mazeZLength);
 
-            if (path == null)
+            // Try starting from second exit
+            List<MazeCell> path2 = DFS.FindPath(maze,
+             exit2,
+             new Position
+             {
+                 x = mazeX,
+                 y = mazeY,
+             }, mazeSpec.mazeXLength, mazeSpec.mazeZLength);
+
+            // Decide which path to use
+            List<MazeCell> path;
+            if (path1 == null && path2 == null)
             {
+                // If no path found, stop
                 return;
+            }
+            else if (path1 == null)
+            {
+                path = path2;
+            }
+            else if (path2 == null)
+            {
+                path = path1;
+            }
+            else if (path1.Count >= path2.Count)
+            {
+                path = path1;
+            }
+            else
+            {
+                path = path2;
             }
 
             // If we found a path, reset all the nodes to have 'onPath' false
@@ -107,6 +142,29 @@ class WorldGenerator
                 cell.onPath = true;
             }
         }
+    }
+
+    public bool IsMazeSolved()
+    {
+        if (exitList.Count != 2)
+        {
+            throw new Exception("Wrong number of exits");
+        }
+        Position exit1 = exitList[0];
+        Position exit2 = exitList[1];
+
+        List<MazeCell> path = DFS.FindPath(maze, exit1, exit2, mazeSpec.mazeXLength, mazeSpec.mazeZLength);
+
+        if (path != null)
+        {
+            // Set 'onPath' to true for the nodes in the path
+            foreach (MazeCell cell in path)
+            {
+                cell.onPath = true;
+            }
+        }
+
+        return path != null;
     }
 
     public Vector3 GetRandomPosition(MazeSpec mazeSpec)

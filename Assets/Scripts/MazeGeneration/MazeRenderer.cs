@@ -10,6 +10,9 @@ public class MazeRenderer : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private WorldGenerator worldGenerator;
 
+    private Position lastMazeClickPos;
+    private bool isGameOver = false;
+
     void Start()
     {
         // Generate the maze and create world array
@@ -26,6 +29,12 @@ public class MazeRenderer : MonoBehaviour
 
     void Update()
     {
+        // No updates after winning
+        if (isGameOver)
+        {
+            return;
+        }
+
         // Get Screen Position
         Vector2 screenPos;
         if (Input.touchCount == 1)
@@ -42,10 +51,22 @@ public class MazeRenderer : MonoBehaviour
         }
 
         // Convert to maze coords
-        Vector2 mazePos = ConvertToMazePos(screenPos);
+        Position mazePos = ConvertToMazePos(screenPos);
+        if (lastMazeClickPos.x == mazePos.x && lastMazeClickPos.y == mazePos.y)
+        {
+            return;
+        }
+        lastMazeClickPos = mazePos;
 
         // Convert to World coords and mark as a path
         worldGenerator.TryAddPath(mazePos);
+
+        // Check if the Game is Won
+        if (worldGenerator.IsMazeSolved())
+        {
+            Debug.Log("WON!");
+            isGameOver = true;
+        }
 
         // Redraw Maze
         DrawMaze();
@@ -96,7 +117,7 @@ public class MazeRenderer : MonoBehaviour
         Camera.main.orthographicSize = worldHeight / 2.0f;
     }
 
-    Vector2 ConvertToMazePos(Vector2 screenPos)
+    Position ConvertToMazePos(Vector2 screenPos)
     {
         // Convert to Unity coordinates
         Vector2 unityPos = Camera.main.ScreenToWorldPoint(screenPos);
@@ -110,6 +131,6 @@ public class MazeRenderer : MonoBehaviour
         Vector2 worldPos = new Vector2(spritePos.x + spriteXSize, spritePos.y + spriteYSize);
 
         // Convert to Maze indicies
-        return new Vector2(worldGenerator.ConvertToMazeCoord(worldPos.x), worldGenerator.ConvertToMazeCoord(worldPos.y));
+        return new Position() { x = worldGenerator.ConvertToMazeCoord(worldPos.x), y = worldGenerator.ConvertToMazeCoord(worldPos.y) };
     }
 }

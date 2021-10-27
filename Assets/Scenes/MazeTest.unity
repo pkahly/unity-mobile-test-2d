@@ -156,11 +156,11 @@ MonoBehaviour:
     algorithm: Prims
     mazeStartX: 0
     mazeStartZ: 0
-    mazeXLength: 20
-    mazeZLength: 15
+    mazeXLength: 40
+    mazeZLength: 30
     courtyardSize: 0
     courtyardOpenings: 0
-    numExits: 0
+    numExits: 2
 --- !u!4 &131332758
 Transform:
   m_ObjectHideFlags: 0
