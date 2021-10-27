@@ -127,15 +127,6 @@ class WorldGenerator
                 path = path2;
             }
 
-            // If we found a path, reset all the nodes to have 'onPath' false
-            for (int x = 0; x < mazeSpec.mazeXLength; x++)
-            {
-                for (int y = 0; y < mazeSpec.mazeZLength; y++)
-                {
-                    maze[x, y].onPath = false;
-                }
-            }
-
             // Set 'onPath' to true for the nodes in the path
             foreach (MazeCell cell in path)
             {
@@ -157,6 +148,15 @@ class WorldGenerator
 
         if (path != null)
         {
+            // If we found a path, reset all the nodes to have 'onPath' false
+            for (int x = 0; x < mazeSpec.mazeXLength; x++)
+            {
+                for (int y = 0; y < mazeSpec.mazeZLength; y++)
+                {
+                    maze[x, y].onPath = false;
+                }
+            }
+
             // Set 'onPath' to true for the nodes in the path
             foreach (MazeCell cell in path)
             {

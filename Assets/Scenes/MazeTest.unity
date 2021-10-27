@@ -153,13 +153,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mazeSpec:
-    algorithm: Prims
+    algorithm: 1
     mazeStartX: 0
     mazeStartZ: 0
     mazeXLength: 40
     mazeZLength: 30
     courtyardSize: 0
-    courtyardOpenings: 0
+    courtyardOpenings: 1
     numExits: 2
 --- !u!4 &131332758
 Transform:

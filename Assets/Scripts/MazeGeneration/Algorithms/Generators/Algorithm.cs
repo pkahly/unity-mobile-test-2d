@@ -14,22 +14,28 @@ public struct Neighbour
     public Wall sharedWall;
 }
 
+public enum AlgorithmType
+{
+    DFS = 0,
+    Prims = 1,
+}
+
 abstract class Algorithm
 {
     protected static System.Random rand = new System.Random();
 
-    public static Algorithm GetAlgorithm(string name)
+    public static Algorithm GetAlgorithm(AlgorithmType algorithm)
     {
-        if (name == "RecursiveBacktracker" || name == "DFS")
+        if (algorithm == AlgorithmType.DFS)
         {
             return new RecursiveBacktracker();
         }
-        else if (name == "Prims")
+        else if (algorithm == AlgorithmType.Prims)
         {
             return new Prims();
         }
 
-        throw new System.Exception("No such algorithm: " + name);
+        throw new System.Exception("No such algorithm: " + algorithm);
     }
 
     // Apply a maze generation algorithm
